@@ -1,0 +1,23 @@
+using System.Net.Http;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Logging;
+
+public class KeepAlivePing
+{
+    private static readonly HttpClient http = new();
+
+    [Function("KeepAlivePing")]
+    public async Task Run(
+        [TimerTrigger("0 */5 * * * *")] TimerInfo timer,
+        ILogger log)
+    {
+        var response = await http.GetAsync(
+            "https://cipp.openlimits.pt/api/PublicPing"
+        );
+
+        log.LogInformation(
+            "KeepAlive executado. Status: {Status}",
+            response.StatusCode
+        );
+    }
+}
